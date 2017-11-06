@@ -48,7 +48,11 @@ public class MineSweeper implements Runnable {
                 JLabel rules7 = new JLabel("there are numbers. These numbers tell you");
                 JLabel rules8 = new JLabel("how many mines are around that cell");
                 JLabel rules9 = new JLabel("to help you deduce where the mines are.");
-                JLabel rules10 = new JLabel("Good luck!");
+                JLabel rules10 = new JLabel("In this version, however, there is a catch.");
+                JLabel rules11 = new JLabel("You have 5 seconds to select a mine.");
+                JLabel rules12 = new JLabel("Otherwise, you lose!");
+                JLabel rules13 = new JLabel("Good luck!");
+                
                 JPanel panel = new JPanel();
                 panel.add(rules1);
                 panel.add(rules2);
@@ -60,12 +64,14 @@ public class MineSweeper implements Runnable {
                 panel.add(rules8);
                 panel.add(rules9);
                 panel.add(rules10);
+                panel.add(rules11);
+                panel.add(rules12);
+                panel.add(rules13);
                 rules.add(panel);
                 
                 rules.pack();
                 rules.setVisible(true);
             }
-          
         }
         
         // Class for keeping track of high scores
@@ -86,13 +92,11 @@ public class MineSweeper implements Runnable {
                
                 try {
                     while(( inputLine = br.readLine()) != null){
-                        
                         prevLine = inputLine + " " + prevLine;
                         
                         JPanel panel = new JPanel();
                         panel.add(new JLabel(prevLine));
                         highscores.add(panel);
-                    
                     }
                 } catch (IOException e1) {
                    
@@ -106,14 +110,10 @@ public class MineSweeper implements Runnable {
                 highscores.pack();
                 highscores.setVisible(true);
             }
-          
         }
-        
-        
         JMenuItem jmiRules = new JMenuItem("How To Play");
         menu.add(jmiRules);
         jmiRules.addActionListener(new rulesActionListener());
-        
         
         JMenuItem highScores = new JMenuItem("High Scores");
         menu.add(highScores);
