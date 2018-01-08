@@ -23,13 +23,6 @@ public class Board extends JPanel {
     private final int ROWS = 16;
     private final int COLUMNS = 16;
     
-    private Cell[][] cells;
-    private int allMines = 40;
-    private int minesLeft = 40;
-    
-    private JLabel statusPanel;
-    private JLabel timerStatus;
-    
     private static BufferedImage ONE;
     private static BufferedImage TWO;
     private static BufferedImage THREE;
@@ -45,21 +38,14 @@ public class Board extends JPanel {
     private static BufferedImage FLAG;
     private static BufferedImage NOTMINE;
     
-    private static final String one = "1.gif"; 
-    private static final String two = "2.gif"; 
-    private static final String three = "3.gif"; 
-    private static final String four = "4.gif"; 
-    private static final String five = "5.gif"; 
-    private static final String six = "6.gif"; 
-    private static final String seven = "7.gif"; 
-    private static final String eight = "8.gif"; 
-    private static final String mine = "mine.gif"; 
-    private static final String explodedmine = "exploded.gif";
-    private static final String covered = "covered.gif"; 
-    private static final String uncovered = "uncovered.gif";
-    private static final String flag = "flag.gif"; 
-    private static final String notmine = "notmine.gif";
+    // Fields
+    private Cell[][] cells;
+    private int allMines = 40;
+    private int minesLeft = 40;
     
+    private JLabel statusPanel;
+    private JLabel timerStatus;
+
     private boolean gameRunning;
     private JFrame restart;
     private long start;
@@ -73,20 +59,20 @@ public class Board extends JPanel {
         this.statusPanel = status;
         this.timerStatus = timerStatus;
         try {
-                ONE = ImageIO.read(new File(one));
-                TWO = ImageIO.read(new File(two));
-                THREE = ImageIO.read(new File(three));
-                FOUR = ImageIO.read(new File(four));
-                FIVE = ImageIO.read(new File(five));
-                SIX = ImageIO.read(new File(six));
-                SEVEN = ImageIO.read(new File(seven));
-                EIGHT = ImageIO.read(new File(eight));
-                MINE = ImageIO.read(new File(mine));
-                EXPLODEDMINE = ImageIO.read(new File(explodedmine));
-                COVERED =ImageIO.read(new File(covered));
-                UNCOVERED = ImageIO.read(new File(uncovered));
-                FLAG = ImageIO.read(new File(flag));
-                NOTMINE = ImageIO.read(new File(notmine));
+                ONE = ImageIO.read(new File("1.gif"));
+                TWO = ImageIO.read(new File("2.gif"));
+                THREE = ImageIO.read(new File("3.gif"));
+                FOUR = ImageIO.read(new File("4.gif"));
+                FIVE = ImageIO.read(new File("5.gif"));
+                SIX = ImageIO.read(new File("6.gif"));
+                SEVEN = ImageIO.read(new File("7.gif"));
+                EIGHT = ImageIO.read(new File("8.gif"));
+                MINE = ImageIO.read(new File("mine.gif"));
+                EXPLODEDMINE = ImageIO.read(new File("exploded.gif"));
+                COVERED =ImageIO.read(new File("covered.gif"));
+                UNCOVERED = ImageIO.read(new File("uncovered.gif"));
+                FLAG = ImageIO.read(new File("flag.gif"));
+                NOTMINE = ImageIO.read(new File("notmine.gif"));
         } catch (IOException e) {
             System.out.println("Internal Error:" + e.getMessage());
         }
