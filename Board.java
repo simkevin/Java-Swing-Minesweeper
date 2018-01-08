@@ -114,6 +114,7 @@ public class Board extends JPanel {
                     minesRemaining -= 1;
                 }
         }
+        
         assignNumMines();
     }
     
@@ -170,8 +171,8 @@ public class Board extends JPanel {
         }
     }
     
-    // determines which image to use depending on what
-    // type of cell each one is
+    /* determines which image to use depending on what
+     * type of cell each one is */
     private BufferedImage correctImage(Cell cell) {
         BufferedImage typeOfImage = UNCOVERED;
         if (cell.getNumAdjacentMines() == 1)
