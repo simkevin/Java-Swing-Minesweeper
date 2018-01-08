@@ -17,13 +17,13 @@ import java.util.Random;
 import javax.swing.*;
 
 public class Board extends JPanel {
+    
     // Constants
     private final int CELLSIZE = 15;   
     private final int ROWS = 16;
     private final int COLUMNS = 16;
     
     private Cell[][] cells;
-    
     private int allMines = 40;
     private int minesLeft = 40;
     
@@ -59,10 +59,11 @@ public class Board extends JPanel {
     private static final String uncovered = "uncovered.gif";
     private static final String flag = "flag.gif"; 
     private static final String notmine = "notmine.gif";
-       
-    private boolean gameRunning;
     
-    // Constants for timer
+    private boolean gameRunning;
+    private JFrame restart;
+    private long start;
+    
     private static Timer timer;
     private int tick = 1000;
     private int duration;
@@ -86,19 +87,18 @@ public class Board extends JPanel {
                 UNCOVERED = ImageIO.read(new File(uncovered));
                 FLAG = ImageIO.read(new File(flag));
                 NOTMINE = ImageIO.read(new File(notmine));
-            
         } catch (IOException e) {
             System.out.println("Internal Error:" + e.getMessage());
         }
-        
         addMouseListener(new MinesAdapter());
         setUpGame();
     }
-
+    
     // this method initiates the game
     public void setUpGame() {
         createCells();
         
+        start = System.currentTimeMillis();
         count = 0;
         duration = 0;
         timer = new Timer(tick, new ActionListener() {
@@ -108,26 +108,25 @@ public class Board extends JPanel {
                 }
             });
         timer.start();
-      
+        
         gameRunning = true;
         minesLeft = allMines;
         
         // Indicates how many mines are remaining based on flags placed by user
         this.statusPanel.setText(Integer.toString(minesLeft)+ " Mines Remaining");
-
+        
         int minesRemaining = allMines;
         Random rand = new Random();
         
         // Places mines randomly in 40 different cells
-        while (minesRemaining >= 0) {
-            
+        while (minesRemaining > 0) {
             int someX = rand.nextInt(ROWS);
             int someY = rand.nextInt(COLUMNS);
-            
             Cell cell = cells[someX][someY];
-
-                cell.placeMine(true);
-                minesRemaining -= 1;
+                if (!cell.hasMine()) {
+                    cell.placeMine();
+                    minesRemaining -= 1;
+                }
         }
         assignNumMines();
     }
@@ -135,13 +134,11 @@ public class Board extends JPanel {
     // cells are created for each row and column
     private void createCells() {
         cells = new Cell[ROWS][COLUMNS];
-
         for (int i = 0; i < ROWS; i++) {
             for (int j = 0; j < COLUMNS; j++) {
                 cells[i][j] = new Cell();
             }
         }
-        
     }
     
     // figures out how many mines are adjacent to a certain cell
@@ -181,7 +178,7 @@ public class Board extends JPanel {
 
                 if (!cell.hasMine()) {
                     int numMines = numAdjacentMines(i, j);
-                    cell.numAdjacentMines(numMines);
+                    cell.setNumAdjacentMines(numMines);
                 }
             }
         }
@@ -191,25 +188,24 @@ public class Board extends JPanel {
     // type of cell each one is
     private BufferedImage correctImage(Cell cell) {
         BufferedImage typeOfImage = UNCOVERED;
-        if (cell.getNumber() == 1)
+        if (cell.getNumAdjacentMines() == 1)
             typeOfImage = ONE;
-        if (cell.getNumber() == 2)
+        if (cell.getNumAdjacentMines() == 2)
             typeOfImage = TWO;
-        if (cell.getNumber() == 3)
+        if (cell.getNumAdjacentMines() == 3)
             typeOfImage = THREE;
-        if (cell.getNumber() == 4)
+        if (cell.getNumAdjacentMines() == 4)
             typeOfImage = FOUR;
-        if (cell.getNumber() == 5)
+        if (cell.getNumAdjacentMines() == 5)
             typeOfImage = FIVE;
-        if (cell.getNumber() == 6)
+        if (cell.getNumAdjacentMines() == 6)
             typeOfImage = SIX;
-        if (cell.getNumber() == 7)
+        if (cell.getNumAdjacentMines() == 7)
             typeOfImage = SEVEN;
-        if (cell.getNumber() == 8)
+        if (cell.getNumAdjacentMines() == 8)
             typeOfImage = EIGHT;    
 
         if (!gameRunning) {
-            
             if (cell.isCovered() && cell.hasMine()) {
                 cell.uncover();
                 typeOfImage = MINE;
@@ -221,6 +217,9 @@ public class Board extends JPanel {
                 } else {
                     typeOfImage = NOTMINE;
                 }
+            }
+            else {
+                typeOfImage = COVERED;
             }
         } else {
             if (cell.isFlagged()) {
@@ -251,11 +250,18 @@ public class Board extends JPanel {
                 int xPos = CELLSIZE * j;
                 int yPos = CELLSIZE * i;
                 BufferedImage kindOfImage = correctImage(cell);
-       
                 g.drawImage(kindOfImage, xPos, yPos, this);
             }
         }
-
+        
+        long now = System.currentTimeMillis();
+        long elapsed = now - start;
+        if (elapsed > 5000) {
+            timer.stop();
+            statusPanel.setText("Game Over. You Lose! :(");
+            Restart();
+        }
+        
         if (gameRunning && coveredCells == 40) {
             gameRunning = false;
             timer.stop();
@@ -272,14 +278,12 @@ public class Board extends JPanel {
     private void uncoverNeighboring(int x, int y) {
         for (int i = -1; i < 2; i++) {
             int tempX = x + i;
-
             if (tempX < 0 || tempX >= ROWS) {
                 continue;
             }
 
             for (int j = -1; j < 2; j++) {
                 int tempY = y + j;
-
                 if (tempY < 0 || tempY >= COLUMNS) {
                     continue;
                 }
@@ -295,17 +299,14 @@ public class Board extends JPanel {
     // once a empty cell is clicked, other empty cells around it 
     // are found using recursion
     public void searchForEmpty(int x, int y) {
-
         for (int i = -1; i < 2; i++) {
             int tempX = x + i;
-
             if (tempX < 0 || tempX >= ROWS) {
                 continue;
             }
 
             for (int j = -1; j < 2; j++) {
                 int tempY = y + j;
-
                 if (tempY < 0 || tempY >= COLUMNS) {
                     continue;
                 }
@@ -324,8 +325,7 @@ public class Board extends JPanel {
     
     // restarts and creates a new game
     public void Restart() {
-        
-        JFrame restart = new JFrame("Restart?");
+        restart = new JFrame("Restart?");
         restart.setPreferredSize(new Dimension(300, 60));
      
         JPanel control_panel = new JPanel();
@@ -336,7 +336,7 @@ public class Board extends JPanel {
             public void actionPerformed(ActionEvent e) {
                 setUpGame();
                 repaint();
-                // need to figure out how to close window after clicking yes
+                restart.dispose();
             }
         });
         
@@ -352,56 +352,59 @@ public class Board extends JPanel {
         
         restart.pack();
         restart.setVisible(true);
-
     }
-
+    
     class MinesAdapter extends MouseAdapter {
         public void mousePressed(MouseEvent e) {
-            int rowPressed = e.getY() / CELLSIZE;
-            int columnPressed = e.getX() / CELLSIZE;
-            boolean redraw = false;   
-
-            if ((rowPressed < 0 || rowPressed >= ROWS) ||
-                    (columnPressed < 0 || columnPressed >= COLUMNS)) {
+            if (!gameRunning) {
                 return;
             }
+            else {
+                int rowPressed = e.getY() / CELLSIZE;
+                int columnPressed = e.getX() / CELLSIZE;
+                boolean redraw = false;   
 
-            Cell cellPressed = cells[rowPressed][columnPressed];
-
-            if (e.getButton() == MouseEvent.BUTTON3) {
-                redraw = true;
-
-                if (!cellPressed.isCovered()) {
+                if ((rowPressed < 0 || rowPressed >= ROWS) ||
+                        (columnPressed < 0 || columnPressed >= COLUMNS)) {
                     return;
                 }
-                if (cellPressed.isFlagged()) {
-                    cellPressed.flag(false);
-                    minesLeft += 1;
+
+                Cell cellPressed = cells[rowPressed][columnPressed];
+
+                if (e.getButton() == MouseEvent.BUTTON3) {
+                    redraw = true;
+
+                    if (!cellPressed.isCovered()) {
+                        return;
+                    }
+                    if (cellPressed.isFlagged()) {
+                        cellPressed.unflag();
+                        minesLeft += 1;
+                    } else {
+                        cellPressed.flag();
+                        minesLeft -= 1;
+                    }
+                    statusPanel.setText(Integer.toString(minesLeft) + " Mines Remaining");
                 } else {
-                    cellPressed.flag(true);
-                    minesLeft -= 1;
-                }
-                statusPanel.setText(Integer.toString(minesLeft) + " Mines Remaining");
-            } else {
-                if (!cellPressed.isCovered() || cellPressed.isFlagged()) {
-                    return;
+                    if (!cellPressed.isCovered() || cellPressed.isFlagged()) {
+                        return;
+                    }
+
+                    redraw = true;
+
+                    cellPressed.uncover();
+                    if (cellPressed.hasMine()) {
+                        gameRunning = false;
+                        
+                    } else if (cellPressed.isEmpty()) {
+                        searchForEmpty(rowPressed, columnPressed);
+                    }
                 }
 
-                redraw = true;
-
-                cellPressed.uncover();
-                if (cellPressed.hasMine()) {
-                    gameRunning = false;
-                    
-                    
-                } else if (cellPressed.isEmpty()) {
-                    searchForEmpty(rowPressed, columnPressed);
+                if (redraw) {
+                    repaint();
                 }
-            }
-
-            if (redraw) {
-                repaint();
             }
         }
-    }
+    }  
 }

@@ -1,13 +1,11 @@
 public class Cell {
-    // fields
+
     private int number;
-    
     private boolean isCovered;
     private boolean isFlagged;
     private boolean isClicked;
     private boolean isMine; 
     
-    // constructor
     public Cell() {
         this.number = 0;
         this.isClicked = false;
@@ -16,7 +14,6 @@ public class Cell {
         this.isMine  = false;
     }
     
-    // methods
     public boolean isCovered() {
         return this.isCovered;
     }
@@ -37,11 +34,11 @@ public class Cell {
         this.isClicked = false;
     }
     
-    public void numAdjacentMines(int num) {
+    public void setNumAdjacentMines(int num) {
         this.number = num;
     }
 
-    public int getNumber() {
+    public int getNumAdjacentMines() {
         return this.number;
     }
     
@@ -49,8 +46,12 @@ public class Cell {
         return this.isFlagged;
     }
     
-    public void flag(boolean flag) {
-        this.isFlagged = flag;
+    public void flag() {
+        this.isFlagged = true;
+    }
+    
+    public void unflag() {
+        this.isFlagged = false;
     }
 
     public boolean isEmpty() {
@@ -61,8 +62,8 @@ public class Cell {
         return this.isMine;
     }
 
-    public void placeMine(boolean mine) {
-        this.isMine = mine;
+    public void placeMine() {
+        this.isMine = true;
     }
     
 }
